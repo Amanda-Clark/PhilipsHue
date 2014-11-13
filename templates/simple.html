@@ -96,10 +96,40 @@
     $( "#briamount" ).val( $( "#bri-range-max" ).slider( "value" ) );
   });
 
+  //Function for turning off
+  $(function() {
+    $( "input[type=submit], a, button" )
+      .button()
+      .click(function( event ) {
+        var toggle;
+        if(this.id =="off") {
+            toggle = "False";
+        }
+        else{
+            toggle = "True";
+        }
+
+        var url="http://127.0.0.1:5000/off";
+        var param="on="+toggle;
+        var http=new XMLHttpRequest();
+        http.open("POST", url, true)
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange=function(){
+            if(http.readyState==4 && http.status==200){
+               document.getElementById("return").innerHTML="Successful";
+            }
+
+
+        }
+        http.send(param);
+      });
+  });
+
   </script>
 </head>
 <body>
- 
+<button id = "off">Turn Light Off</button>
+<button id = "on">Turn Light On</button>
 <p>
   <label for="amount">Hue Value:</label>
   <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">

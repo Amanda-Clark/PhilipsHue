@@ -13,7 +13,7 @@ def setup():
 def hue():
     hue=request.form['hue']
     payload = {'hue': int(hue), 'transitiontime': 0}
-    r = requests.put("http://10.1.11.222/api/[username]/lights/3/state/", data = json.dumps(payload))
+    r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     print(content)
     return content
@@ -22,7 +22,7 @@ def hue():
 def sat():
     sat=request.form['sat']
     payload = {'sat': int(sat), 'transitiontime': 0}
-    r = requests.put("http://10.1.11.222/api/[username]/lights/3/state/", data = json.dumps(payload))
+    r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     print(content)
 
@@ -30,10 +30,20 @@ def sat():
 def bri():
     bri=request.form['bri']
     payload = {'bri': int(bri), 'transitiontime': 0}
-    r = requests.put("http://10.1.11.222/api/[username]/lights/3/state/", data = json.dumps(payload))
+    r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     print(content)
 
+@app.route('/off', methods=['POST'])
+def off():
+    toggle = request.form['on']
+    if toggle == "False":
+        payload = {'on': False}
+    else:
+        payload = {'on': True}
+    r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
+    content = json.loads(r.content.decode())
+    print(content, off)
 
 
 
