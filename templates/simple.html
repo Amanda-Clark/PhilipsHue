@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Phillips Hue WebApp</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script>
+  //Function that sends the hue via AJAX to server side code
+  $(function() {
+    $( "#slider-range-max" ).slider({
+      range: "max",
+      min: 0,
+      max: 65535,
+      value: 1,
+      slide: function( event, ui ) {
+        $( "#amount" ).val( ui.value );
+        var hue = ui.value;
+
+        var url="http://127.0.0.1:5000/hue";
+        var param="hue="+hue;
+        var http=new XMLHttpRequest();
+        http.open("POST", url, true)
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange=function(){
+            if(http.readyState==4 && http.status==200){
+               document.getElementById("return").innerHTML="Successful";
+            }
+
+
+        }
+        http.send(param);
+      }
+    });
+    $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+  });
+  //Function that sends sat data to server
+  $(function() {
+    $( "#sat-range-max" ).slider({
+      range: "max",
+      min: 0,
+      max: 255,
+      value: 1,
+      slide: function( event, ui ) {
+        $( "#satamount" ).val( ui.value );
+        var sat = ui.value;
+
+        var url="http://127.0.0.1:5000/sat";
+        var param="sat="+sat;
+        var http=new XMLHttpRequest();
+        http.open("POST", url, true)
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange=function(){
+            if(http.readyState==4 && http.status==200){
+               document.getElementById("return").innerHTML="Successful";
+            }
+
+
+        }
+        http.send(param);
+      }
+    });
+    $( "#satamount" ).val( $( "#sat-range-max" ).slider( "value" ) );
+  });
+
+  //Function that sends the brightness via AJAX to server side code
+  $(function() {
+    $( "#bri-range-max" ).slider({
+      range: "max",
+      min: 0,
+      max: 255,
+      value: 1,
+      step: 1,
+      slide: function( event, ui ) {
+        $( "#briamount" ).val( ui.value );
+        var bri = ui.value;
+
+        var url="http://127.0.0.1:5000/bri";
+        var param="bri="+bri;
+        var http=new XMLHttpRequest();
+        http.open("POST", url, true)
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange=function(){
+            if(http.readyState==4 && http.status==200){
+               document.getElementById("return").innerHTML="Successful";
+            }
+
+
+        }
+        http.send(param);
+      }
+    });
+    $( "#briamount" ).val( $( "#bri-range-max" ).slider( "value" ) );
+  });
+
+  </script>
+</head>
+<body>
+ 
+<p>
+  <label for="amount">Hue Value:</label>
+  <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+</p>
+<div id="slider-range-max"></div>
+<div id="return"></div>
+
+<p>
+  <label for="satamount">Sat Value:</label>
+  <input type="text" id="satamount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+</p>
+<div id="sat-range-max"></div>
+<div id="return"></div>
+
+<p>
+  <label for="briamount">Bri Value:</label>
+  <input type="text" id="briamount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+</p>
+<div id="bri-range-max"></div>
+<div id="return"></div>
+ 
+ 
+</body>
+</html>
