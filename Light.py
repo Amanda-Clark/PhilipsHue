@@ -14,9 +14,16 @@ def hue():
     hue=request.form['hue']
     payload = {'hue': int(hue), 'transitiontime': 0}
     r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
+    #r2 = requests.put("http://10.1.11.222/api/amandapanda/lights/2/state/", data = json.dumps(payload))
+    #r1 = requests.put("http://10.1.11.222/api/amandapanda/lights/1/state/", data = json.dumps(payload))
+    #r4 = requests.put("http://10.1.11.222/api/amandapanda/lights/4/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
-    print(content)
-    return content
+    #content2 = json.loads(r2.content.decode())
+    #content1 = json.loads(r1.content.decode())
+    #content4 = json.loads(r4.content.decode())
+    return str([content])#, content2, content1, content4])
+    #print(content)
+
 
 @app.route('/sat', methods=['POST'])
 def sat():
@@ -24,7 +31,8 @@ def sat():
     payload = {'sat': int(sat), 'transitiontime': 0}
     r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
-    print(content)
+    return str(content)
+    #print(content)
 
 @app.route('/bri', methods=['POST'])
 def bri():
@@ -32,7 +40,8 @@ def bri():
     payload = {'bri': int(bri), 'transitiontime': 0}
     r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
-    print(content)
+    return str(content)
+    #print(content)
 
 @app.route('/off', methods=['POST'])
 def off():
@@ -43,7 +52,8 @@ def off():
         payload = {'on': True}
     r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
     content = json.loads(r.content.decode())
-    print(content, off)
+    return str(content)
+   # print(content, off)
 
 
 
