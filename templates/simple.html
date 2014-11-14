@@ -96,7 +96,7 @@
     $( "#briamount" ).val( $( "#bri-range-max" ).slider( "value" ) );
   });
 
-  //Function for turning off
+  //Function for turning off/on
   $(function() {
     $( "input[type=submit], a, button" )
       .button()
@@ -125,9 +125,59 @@
       });
   });
 
+  //Function for turning off/on
+   function turnoff() {
+
+    $( "input[type=submit], a, button" )
+      .button()
+      .click(function( event ) {
+        var state;
+
+        if(this.id =="effect") {
+            state = "colorloop";
+        }
+        else{
+            state = "none";
+        }
+
+        var url="http://127.0.0.1:5000/effect";
+        var param="state="+state;
+        var http=new XMLHttpRequest();
+        http.open("POST", url, true)
+        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        http.onreadystatechange=function(){
+            if(http.readyState==4 && http.status==200){
+               document.getElementById("return").innerHTML=http.responseText;
+            }
+
+
+        }
+        http.send(param);
+      });
+  };
+
+   function getInitialData(){
+       var url="http://127.0.0.1:5000/get";
+       //var param="state="+state;
+       var http=new XMLHttpRequest();
+       http.open("POST", url, true)
+       http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+       http.onreadystatechange=function(){
+            if(http.readyState==4 && http.status==200){
+               document.getElementById("return").innerHTML=http.responseText;
+            }
+
+
+        }
+       http.send();
+
+   }
+
+
+
   </script>
 </head>
-<body>
+<body onload = "getInitialData()">
 <button id = "off">Turn Light Off</button>
 <button id = "on">Turn Light On</button>
 <p>
@@ -155,6 +205,8 @@
 
 
 <br>
+<button id = "effect" onclick="turnoff()">Turn Color Loop On</button>
+<button id = "effect2" onclick = "turnoff()">Turn Color Loop Off</button>
 <div id="return"></div>
  
  

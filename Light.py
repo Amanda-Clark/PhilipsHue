@@ -55,7 +55,24 @@ def off():
     return str(content)
    # print(content, off)
 
+@app.route('/effect', methods=['POST'])
+def effect():
+    state = request.form['state']
+    if state == "colorloop":
+        payload = {'effect': 'colorloop'}
+    else:
+        payload = {'effect': 'none'}
+    r = requests.put("http://10.1.11.222/api/amandapanda/lights/3/state/", data = json.dumps(payload))
+    content = json.loads(r.content.decode())
+    return str(content)
+   # print(content, off)
 
+@app.route('/get', methods=['POST'])
+def getInitialData():
+    r = requests.get("http://10.1.11.222/api/amandapanda/lights/3/")
+    content = json.loads(r.content.decode())
+    return str(content)
+   # print(content, off)
 
 if __name__ == '__main__':
     app.run()
