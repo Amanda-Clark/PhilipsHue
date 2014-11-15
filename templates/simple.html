@@ -11,6 +11,7 @@
   //Function that sends the hue via AJAX to server side code
   $(function() {
     $( "#slider-range-max" ).slider({
+
       range: "max",
       min: 0,
       max: 65535,
@@ -20,7 +21,8 @@
         var hue = ui.value;
 
         var url="http://127.0.0.1:5000/hue";
-        var param="hue="+hue;
+        var light = $("#lightlist option:selected").val();
+        var param="hue="+hue+"&light="+light;
         var http=new XMLHttpRequest();
         http.open("POST", url, true)
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -48,7 +50,8 @@
         var sat = ui.value;
 
         var url="http://127.0.0.1:5000/sat";
-        var param="sat="+sat;
+        var light = $("#lightlist option:selected").val();
+        var param="sat="+sat+"&light="+light;
         var http=new XMLHttpRequest();
         http.open("POST", url, true)
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -79,7 +82,8 @@
         var bri = ui.value;
 
         var url="http://127.0.0.1:5000/bri";
-        var param="bri="+bri;
+        var light = $("#lightlist option:selected").val();
+        var param="bri="+bri+"&light="+light;
         var http=new XMLHttpRequest();
         http.open("POST", url, true)
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -108,9 +112,10 @@
         else{
             toggle = "True";
         }
+        var light = $("#lightlist option:selected").val();
 
         var url="http://127.0.0.1:5000/off";
-        var param="on="+toggle;
+        var param="on="+toggle+"&light="+light;
         var http=new XMLHttpRequest();
         http.open("POST", url, true)
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -125,7 +130,7 @@
       });
   });
 
-  //Function for turning off/on
+  //Function for turning off/on colorloop
    function turnoff() {
 
     $( "input[type=submit], a, button" )
@@ -140,8 +145,10 @@
             state = "none";
         }
 
+        var light = $("#lightlist option:selected").val();
+
         var url="http://127.0.0.1:5000/effect";
-        var param="state="+state;
+        var params="state="+state+"&light="+light;
         var http=new XMLHttpRequest();
         http.open("POST", url, true)
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -152,7 +159,7 @@
 
 
         }
-        http.send(param);
+        http.send(params);
       });
   };
 
@@ -172,12 +179,16 @@
        http.send();
 
    }
-
-
-
-  </script>
+   </script>
 </head>
 <body onload = "getInitialData()">
+Select Light:
+<select name ="lightlist" id = "lightlist">
+    {% for lightnum in data %}
+        <option value = {{ lightnum }}>{{ lightnum }}</option>
+    {% endfor %}
+</select>
+<br>
 <button id = "off">Turn Light Off</button>
 <button id = "on">Turn Light On</button>
 <p>
