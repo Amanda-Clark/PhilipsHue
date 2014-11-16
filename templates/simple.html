@@ -45,6 +45,7 @@
       min: 0,
       max: 255,
       value: 1,
+      step: 1,
       slide: function( event, ui ) {
         $( "#satamount" ).val( ui.value );
         var sat = ui.value;
@@ -52,6 +53,9 @@
         var url="http://127.0.0.1:5000/sat";
         var light = $("#lightlist option:selected").val();
         var param="sat="+sat+"&light="+light;
+        //alert(url);
+        //alert(light);
+        //alert(param);
         var http=new XMLHttpRequest();
         http.open("POST", url, true)
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
