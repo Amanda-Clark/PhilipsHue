@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request
 import requests
 import json
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor as Pool
+from timeit import default_timer as timer
+from queue import Queue
 
 app = Flask(__name__)
 
@@ -16,23 +21,42 @@ def setup():
             lights.append(light)
     lights.append("All Lights")
 
-    return render_template('simple.html', data = lights)
+    lightData = setSliders(lights, content, numOfLights)
+
+    return render_template('simple.html', data = lights, lightInfo = lightData)
+
+
+def setSliders(lights, content, numOfLights):
+    lightList = []
+
+    for num in range(1,numOfLights+1):
+        lightList.append(LightInfo(num, content[str(num)]['state']['bri'], content[str(num)]['state']['sat'],
+                                   content[str(num)]['state']['hue']))
+
+    return lightList
+
+
 
 @app.route('/hue', methods=['POST'])
 def hue():
+
     hue=request.form['hue']
     lights = request.form['light']
     if lights == "All":
         lights =0
     payload = {'hue': int(hue), 'transitiontime': 0}
     if lights != 0:
+
         r = requests.put("http://10.1.11.222/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
     else:
+
         r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
 
     content = json.loads(r.content.decode())
 
     return str([content])
+
+
 
 
 
@@ -114,6 +138,14 @@ def getInitialData():
             lights.append(light)
 
     return str(content)
+
+
+class LightInfo():
+    def __init__(self, lightnum, bri, sat, hue):
+        self.lightnum = lightnum
+        self.bri = bri
+        self.sat = sat
+        self.hue = hue
 
 
 if __name__ == '__main__':
