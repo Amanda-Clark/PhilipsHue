@@ -1,45 +1,57 @@
 from flask import Flask, render_template, request
 import requests
 import json
-import threading
-import time
-from concurrent.futures import ThreadPoolExecutor as Pool
-from timeit import default_timer as timer
-from queue import Queue
 
 app = Flask(__name__)
 
 
 @app.route('/', methods = ['GET'])
 def setup():
+    """
+    Initial setup method. Returns class of data representing
+    data for first light in dropdown list. When page loads,
+    the sliders are set to the data for the first light in the
+    drop down that is displayed.
+    """
     lights = []
     r = requests.get("http://10.1.11.222/api/amandapanda/lights")
     content = json.loads(r.content.decode())
     numOfLights = len(content)
+    #our light numbering system starts at 1, so using that instead of 0 for the range
     for light in range(1, numOfLights+1):
         if content[str(light)]['state']['on']==True:
             lights.append(light)
     lights.append("All Lights")
+    num = lights[0] # get the current light that's first in the drop down list
+    #Class to send the light data for setting the sliders to the .html
+    lightList = LightInfo(num, content[str(num)]['state']['bri'], content[str(num)]['state']['sat'],
+                                   content[str(num)]['state']['hue'])
+    return render_template('simple.html', data = lights, lightInfo = lightList)
 
-    lightData = setSliders(lights, content, numOfLights)
 
-    return render_template('simple.html', data = lights, lightInfo = lightData)
+@app.route('/update', methods = ['POST'])
+def update():
+    """
+    Function called when a different light is selected from the dropdown
+    and the sliders need to be changed to a different state. Still in progress.
+    :return:
+    """
+    num = request.form['num']
+    r = requests.get("http://10.1.11.222/api/amandapanda/lights")
+    content = json.loads(r.content.decode())
+    lightList = LightInfo(num, content[str(num)]['state']['bri'], content[str(num)]['state']['sat'],
+                                   content[str(num)]['state']['hue'])
 
-
-def setSliders(lights, content, numOfLights):
-    lightList = []
-
-    for num in range(1,numOfLights+1):
-        lightList.append(LightInfo(num, content[str(num)]['state']['bri'], content[str(num)]['state']['sat'],
-                                   content[str(num)]['state']['hue']))
-
-    return lightList
-
+    # TODO: How to actually return updated data
 
 
 @app.route('/hue', methods=['POST'])
 def hue():
-
+    """
+    Function called when the hue is changed via the slider.
+    Actually calls the API to change light state.
+    :return:
+    """
     hue=request.form['hue']
     lights = request.form['light']
     if lights == "All":
@@ -53,15 +65,17 @@ def hue():
         r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
 
     content = json.loads(r.content.decode())
-
+    # TODO: How to return status of API call
     return str([content])
-
-
-
 
 
 @app.route('/sat', methods=['POST'])
 def sat():
+    """
+    Function called when the sat is changed via the slider.
+    Actually calls the API to change light state.
+    :return:
+    """
     sat=request.form['sat']
     lights = request.form['light']
 
@@ -78,6 +92,11 @@ def sat():
 
 @app.route('/bri', methods=['POST'])
 def bri():
+    """
+    Function called when the bri is changed via the slider.
+    Actually calls the API to change light state.
+    :return:
+    """
     bri=request.form['bri']
     lights = request.form['light']
     if lights == "All":
@@ -93,6 +112,11 @@ def bri():
 
 @app.route('/off', methods=['POST'])
 def off():
+    """
+    Function called when the the lights are toggled on and off.
+    Actually calls the API to change light state.
+    :return:
+    """
     toggle = request.form['on']
     lights = request.form['light']
     if lights == "All":
@@ -111,6 +135,10 @@ def off():
 
 @app.route('/effect', methods=['POST'])
 def effect():
+    """
+    This function calls the colorloop demo that comes with the Phillips Hue light system.
+    :return:
+    """
     state = request.form['state']
     lights = request.form['light']
     if lights == "All":
@@ -127,8 +155,13 @@ def effect():
     content = json.loads(r.content.decode())
     return str(content)
 
+
 @app.route('/get', methods=['POST'])
 def getInitialData():
+    """
+    Function for returning dump of initial data for when page initially loads.
+    :return:
+    """
     lights = []
     r = requests.get("http://10.1.11.222/api/amandapanda/lights")
     content = json.loads(r.content.decode())
@@ -141,6 +174,9 @@ def getInitialData():
 
 
 class LightInfo():
+    """
+    Class for organizing light data.
+    """
     def __init__(self, lightnum, bri, sat, hue):
         self.lightnum = lightnum
         self.bri = bri

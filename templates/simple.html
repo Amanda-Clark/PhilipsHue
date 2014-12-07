@@ -1,198 +1,217 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Philips Hue WebApp</title>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
-  <link rel="stylesheet" href="/resources/demos/style.css">
-  <script>
-  //Function that sends the hue via AJAX to server side code
-  $(function() {
-    $( "#slider-range-max" ).slider({
 
-      range: "max",
-      min: 0,
-      max: 65535,
-      value: 1,
-      slide: function( event, ui ) {
-        $( "#amount" ).val( ui.value );
-        var hue = ui.value;
+    <meta charset="utf-8">
+    <title>Philips Hue WebApp</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
-        var url="http://127.0.0.1:5000/hue";
-        var light = $("#lightlist option:selected").val();
-        var param="hue="+hue+"&light="+light;
-        var http=new XMLHttpRequest();
-        http.open("POST", url, true)
-        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        http.onreadystatechange=function(){
-            if(http.readyState==4 && http.status==200){
-               document.getElementById("return").innerHTML=http.responseText;
+    <script>
+        var hue = {{ lightInfo.hue }};
+
+        //Function that sends the hue via AJAX to server side code
+        $(function() {
+            $( "#slider-range-max" ).slider({
+                range: "max",
+                min: 0,
+                max: 65535,
+                value: hue,
+               slide: function( event, ui ) {
+                   $( "#amount" ).val( ui.value );
+                   var hue = ui.value;
+                   var url="http://127.0.0.1:5000/hue";
+                   var light = $("#lightlist option:selected").val();
+                   var param="hue="+hue+"&light="+light;
+                   var http=new XMLHttpRequest();
+                   http.open("POST", url, true)
+                   http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                   http.onreadystatechange=function(){
+                       if(http.readyState==4 && http.status==200){
+                       //document.getElementById("return").innerHTML=http.responseText;
+                       }
+                   }
+                   http.send(param);
+               }
+            });
+        $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
+        });
+
+        //Function that sends sat data to server
+        $(function() {
+            var sat = {{ lightInfo.sat }};
+            $( "#sat-range-max" ).slider({
+                range: "max",
+                min: 0,
+                max: 255,
+                value: sat,
+                step: 1,
+                slide: function( event, ui ) {
+                    $( "#satamount" ).val( ui.value );
+                    var sat = ui.value;
+                    var url="http://127.0.0.1:5000/sat";
+                    var light = $("#lightlist option:selected").val();
+                    var param="sat="+sat+"&light="+light;
+
+                    var http=new XMLHttpRequest();
+                    http.open("POST", url, true);
+                    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    http.onreadystatechange=function(){
+                        if(http.readyState==4 && http.status==200){
+                            document.getElementById("return").innerHTML=http.responseText;
+                        }
+                    }
+                    http.send(param);
+                }
+            });
+        $( "#satamount" ).val( $( "#sat-range-max" ).slider( "value" ) );
+        });
+
+        function getUpdatedData(){
+
+            var updatedLights = new Array();
+            var url = "http://127.0.0.1:5000/update";
+            var light = $("#lightlist option:selected").val();
+            alert(light);
+            var bri;
+            var param = "num="+light;
+            var http = new XMLHttpRequest();
+            http.open("POST", url, true);
+            http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            http.onreadystatechange=function(){
+                if(http.readyState==4 && http.status==200){
+                    alert("Success");
+                }
             }
+            http.send(param);
 
 
-        }
-        http.send(param);
-      }
-    });
-    $( "#amount" ).val( $( "#slider-range-max" ).slider( "value" ) );
-  });
-  //Function that sends sat data to server
-  $(function() {
-    $( "#sat-range-max" ).slider({
-      range: "max",
-      min: 0,
-      max: 255,
-      value: 1,
-      step: 1,
-      slide: function( event, ui ) {
-        $( "#satamount" ).val( ui.value );
-        var sat = ui.value;
+        };//getUpdatedData
 
-        var url="http://127.0.0.1:5000/sat";
-        var light = $("#lightlist option:selected").val();
-        var param="sat="+sat+"&light="+light;
-        //alert(url);
-        //alert(light);
-        //alert(param);
-        var http=new XMLHttpRequest();
-        http.open("POST", url, true)
-        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        http.onreadystatechange=function(){
-            if(http.readyState==4 && http.status==200){
-               document.getElementById("return").innerHTML=http.responseText;
+
+        //Function that sends the brightness via AJAX to server side code
+
+        $(function () {
+            var bri = {{ lightInfo.bri }};
+            $( "#bri-range-max" ).slider({
+                range: "max",
+                min: 0,
+                max: 255,
+                value: bri,
+                step: 1,
+            slide: function( event, ui ) {
+                $( "#briamount" ).val( ui.value );
+                var bri = ui.value;
+                var url="http://127.0.0.1:5000/bri";
+                var light = $("#lightlist option:selected").val();
+                var param="bri="+bri+"&light="+light;
+                var http=new XMLHttpRequest();
+                http.open("POST", url, true)
+                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                http.onreadystatechange=function(){
+                    if(http.readyState==4 && http.status==200){
+                        //document.getElementById("return").innerHTML=http.responseText;
+                    }
+
+                }
+                http.send(param);
             }
+            });
+            $( "#briamount" ).val( $( "#bri-range-max" ).slider( "value" ) );
+        });
 
 
-        }
-        http.send(param);
-      }
-    });
-    $( "#satamount" ).val( $( "#sat-range-max" ).slider( "value" ) );
-  });
+         //Function for turning off/on
+        $(function() {
+            $( "input[type=submit], a, button" )
+            .button()
+            .click(function( event ) {
+                var toggle;
+                if(this.id =="off") {
+                    toggle = "False";
+                }
+                else{
+                    toggle = "True";
+                }
+                var light = $("#lightlist option:selected").val();
 
-  //Function that sends the brightness via AJAX to server side code
-  //Foobar
-  $(function() {
-    $( "#bri-range-max" ).slider({
-      range: "max",
-      min: 0,
-      max: 255,
-      value: 1,
-      step: 1,
-      slide: function( event, ui ) {
-        $( "#briamount" ).val( ui.value );
-        var bri = ui.value;
+                var url="http://127.0.0.1:5000/off";
+                var param="on="+toggle+"&light="+light;
+                var http=new XMLHttpRequest();
+                http.open("POST", url, true)
+                http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                http.onreadystatechange=function(){
+                    if(http.readyState==4 && http.status==200){
+                    //document.getElementById("return").innerHTML=http.responseText;
+                    }
+                }
+                http.send(param);
+            });
+        });
 
-        var url="http://127.0.0.1:5000/bri";
-        var light = $("#lightlist option:selected").val();
-        var param="bri="+bri+"&light="+light;
-        var http=new XMLHttpRequest();
-        http.open("POST", url, true)
-        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        http.onreadystatechange=function(){
-            if(http.readyState==4 && http.status==200){
-               document.getElementById("return").innerHTML=http.responseText;
+
+        //Function for turning off/on colorloop
+        function turnoff() {
+            $( "input[type=submit], a, button" )
+            .button()
+            .click(function( event ) {
+                var state;
+                if(this.id =="effect") {
+                    state = "colorloop";
+                }
+                else{
+                    state = "none";
+                }
+
+            var light = $("#lightlist option:selected").val();
+            var url="http://127.0.0.1:5000/effect";
+            var params="state="+state+"&light="+light;
+            var http=new XMLHttpRequest();
+            http.open("POST", url, true)
+            http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            http.onreadystatechange=function(){
+                if(http.readyState==4 && http.status==200){
+               //document.getElementById("return").innerHTML=http.responseText;
+                }
             }
+            http.send(params);
+            });
+        };
 
 
-        }
-        http.send(param);
-      }
-    });
-    $( "#briamount" ).val( $( "#bri-range-max" ).slider( "value" ) );
-  });
 
-  //Function for turning off/on
-  $(function() {
-    $( "input[type=submit], a, button" )
-      .button()
-      .click(function( event ) {
-        var toggle;
-        if(this.id =="off") {
-            toggle = "False";
-        }
-        else{
-            toggle = "True";
-        }
-        var light = $("#lightlist option:selected").val();
-
-        var url="http://127.0.0.1:5000/off";
-        var param="on="+toggle+"&light="+light;
-        var http=new XMLHttpRequest();
-        http.open("POST", url, true)
-        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        http.onreadystatechange=function(){
-            if(http.readyState==4 && http.status==200){
-               document.getElementById("return").innerHTML=http.responseText;
+        function getInitialData(){
+            var url="http://127.0.0.1:5000/get";
+            alert("getInitialData() Called on body onload");
+            //var param="state="+state;
+            var http=new XMLHttpRequest();
+            http.open("POST", url, true)
+            http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            http.onreadystatechange=function(){
+                if(http.readyState==4 && http.status==200){
+                    document.getElementById("return").innerHTML=http.responseText;
+                }
             }
+            http.send();
 
 
         }
-        http.send(param);
-      });
-  });
-
-  //Function for turning off/on colorloop
-   function turnoff() {
-
-    $( "input[type=submit], a, button" )
-      .button()
-      .click(function( event ) {
-        var state;
-
-        if(this.id =="effect") {
-            state = "colorloop";
-        }
-        else{
-            state = "none";
-        }
-
-        var light = $("#lightlist option:selected").val();
-
-        var url="http://127.0.0.1:5000/effect";
-        var params="state="+state+"&light="+light;
-        var http=new XMLHttpRequest();
-        http.open("POST", url, true)
-        http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        http.onreadystatechange=function(){
-            if(http.readyState==4 && http.status==200){
-               document.getElementById("return").innerHTML=http.responseText;
-            }
-
-
-        }
-        http.send(params);
-      });
-  };
-
-   function getInitialData(){
-       var url="http://127.0.0.1:5000/get";
-       //var param="state="+state;
-       var http=new XMLHttpRequest();
-       http.open("POST", url, true)
-       http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-       http.onreadystatechange=function(){
-            if(http.readyState==4 && http.status==200){
-               document.getElementById("return").innerHTML=http.responseText;
-            }
-
-
-        }
-       http.send();
-
-   }
    </script>
+
 </head>
 <body onload = "getInitialData()">
+
 Select Light:
-<select name ="lightlist" id = "lightlist">
+<select name ="lightlist" id = "lightlist" onchange = "getUpdatedData();">
     {% for lightnum in data %}
         <option value = {{ lightnum }}>{{ lightnum }}</option>
     {% endfor %}
+
 </select>
 <br>
+
+
 <button id = "off">Turn Light Off</button>
 <button id = "on">Turn Light On</button>
 <p>
@@ -216,12 +235,13 @@ Select Light:
 
 
 <div id="bri-range-max"></div>
-
+<div id = "blah"></div>
 
 
 <br>
 <button id = "effect" onclick="turnoff()">Turn Color Loop On</button>
 <button id = "effect2" onclick = "turnoff()">Turn Color Loop Off</button>
+
 <div id="return"></div>
  
  
