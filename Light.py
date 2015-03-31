@@ -5,6 +5,18 @@ import json
 app = Flask(__name__)
 
 
+def getBridgeIP():
+    """
+    Retrieves bridge IP
+
+    """
+    #Get IP address of bridge. See http://www.developers.meethue.com/documentation/hue-bridge-discovery
+    #for more details
+    ip = requests.get("https://client-eastwood-dot-hue-prod-us.appspot.com/api/nupnp")
+    ipcontent = json.loads(ip.content.decode())
+    ipaddr = ipcontent[0]['internalipaddress']
+    return ipaddr
+
 @app.route('/', methods = ['GET'])
 def setup():
     """
@@ -13,8 +25,9 @@ def setup():
     the sliders are set to the data for the first light in the
     drop down that is displayed.
     """
-    lights = []
-    r = requests.get("http://10.1.11.222/api/amandapanda/lights")
+    lights =[]
+    ipaddr = getBridgeIP()
+    r = requests.get("http://"+ipaddr+"/api/amandapanda/lights")
     content = json.loads(r.content.decode())
     numOfLights = len(content)
     #our light numbering system starts at 1, so using that instead of 0 for the range
@@ -37,7 +50,8 @@ def update():
     :return:
     """
     num = request.form['num']
-    r = requests.get("http://10.1.11.222/api/amandapanda/lights")
+    ipaddr = getBridgeIP()
+    r = requests.get("http://"+ipaddr+"/api/amandapanda/lights")
     content = json.loads(r.content.decode())
     lightList = LightInfo(num, content[str(num)]['state']['bri'], content[str(num)]['state']['sat'],
                                    content[str(num)]['state']['hue'])
@@ -52,6 +66,7 @@ def hue():
     Actually calls the API to change light state.
     :return:
     """
+    ipaddr = getBridgeIP()
     hue=request.form['hue']
     lights = request.form['light']
     if lights == "All":
@@ -59,10 +74,10 @@ def hue():
     payload = {'hue': int(hue), 'transitiontime': 0}
     if lights != 0:
 
-        r = requests.put("http://10.1.11.222/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
     else:
 
-        r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/groups/0/action", data = json.dumps(payload))
 
     content = json.loads(r.content.decode())
     # TODO: How to return status of API call
@@ -76,6 +91,7 @@ def sat():
     Actually calls the API to change light state.
     :return:
     """
+    ipaddr = getBridgeIP()
     sat=request.form['sat']
     lights = request.form['light']
 
@@ -83,9 +99,9 @@ def sat():
         lights =0
     payload = {'sat': int(sat), 'transitiontime': 0}
     if lights != 0:
-        r = requests.put("http://10.1.11.222/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
     else:
-        r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/groups/0/action", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     return str(content)
 
@@ -97,15 +113,16 @@ def bri():
     Actually calls the API to change light state.
     :return:
     """
+    ipaddr = getBridgeIP()
     bri=request.form['bri']
     lights = request.form['light']
     if lights == "All":
         lights =0
     payload = {'bri': int(bri), 'transitiontime': 0}
     if lights != 0:
-        r = requests.put("http://10.1.11.222/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
     else:
-        r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/groups/0/action", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     return str(content)
 
@@ -117,6 +134,7 @@ def off():
     Actually calls the API to change light state.
     :return:
     """
+    ipaddr = getBridgeIP()
     toggle = request.form['on']
     lights = request.form['light']
     if lights == "All":
@@ -126,9 +144,9 @@ def off():
     else:
         payload = {'on': True, 'transitiontime': 0}
     if lights != 0:
-        r = requests.put("http://10.1.11.222/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
     else:
-        r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/groups/0/action", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     return str(content)
 
@@ -139,6 +157,7 @@ def effect():
     This function calls the colorloop demo that comes with the Phillips Hue light system.
     :return:
     """
+    ipaddr = getBridgeIP()
     state = request.form['state']
     lights = request.form['light']
     if lights == "All":
@@ -149,9 +168,9 @@ def effect():
     else:
         payload = {'effect': 'none'}
     if lights != 0:
-        r = requests.put("http://10.1.11.222/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/lights/"+lights+"/state/", data = json.dumps(payload))
     else:
-        r = requests.put("http://10.1.11.222/api/amandapanda/groups/0/action", data = json.dumps(payload))
+        r = requests.put("http://"+ipaddr+"/api/amandapanda/groups/0/action", data = json.dumps(payload))
     content = json.loads(r.content.decode())
     return str(content)
 
@@ -162,12 +181,13 @@ def getInitialData():
     Function for returning dump of initial data for when page initially loads.
     :return:
     """
+    ipaddr = getBridgeIP()
     lights = []
-    r = requests.get("http://10.1.11.222/api/amandapanda/lights")
+    r = requests.get("http://"+ipaddr+"/api/amandapanda/lights")
     content = json.loads(r.content.decode())
     numOfLights = len(content)
     for light in range(1, numOfLights+1):
-        if content[str(light)]['state']['on']==True:
+        if content[str(light)]['state']['on'] == True:
             lights.append(light)
 
     return str(content)

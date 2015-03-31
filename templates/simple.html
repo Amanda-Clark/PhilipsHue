@@ -73,7 +73,7 @@
             var updatedLights = new Array();
             var url = "http://127.0.0.1:5000/update";
             var light = $("#lightlist option:selected").val();
-            alert(light);
+           // alert(light);
             var bri;
             var param = "num="+light;
             var http = new XMLHttpRequest();
@@ -81,7 +81,7 @@
             http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             http.onreadystatechange=function(){
                 if(http.readyState==4 && http.status==200){
-                    alert("Success");
+                    //alert("Success");
                 }
             }
             http.send(param);
@@ -183,7 +183,7 @@
 
         function getInitialData(){
             var url="http://127.0.0.1:5000/get";
-            alert("getInitialData() Called on body onload");
+            //alert("getInitialData() Called on body onload");
             //var param="state="+state;
             var http=new XMLHttpRequest();
             http.open("POST", url, true)
