@@ -10,7 +10,7 @@
 
     <script>
         var hue = {{ lightInfo.hue }};
-
+        var serverIp = window.location.href;
         //Function that sends the hue via AJAX to server side code
         $(function() {
             $( "#slider-range-max" ).slider({
@@ -21,7 +21,7 @@
                slide: function( event, ui ) {
                    $( "#amount" ).val( ui.value );
                    var hue = ui.value;
-                   var url="http://127.0.0.1:5000/hue";
+                   var url=serverIp+"hue";
                    var light = $("#lightlist option:selected").val();
                    var param="hue="+hue+"&light="+light;
                    var http=new XMLHttpRequest();
@@ -50,7 +50,7 @@
                 slide: function( event, ui ) {
                     $( "#satamount" ).val( ui.value );
                     var sat = ui.value;
-                    var url="http://127.0.0.1:5000/sat";
+                    var url= serverIp+"sat";
                     var light = $("#lightlist option:selected").val();
                     var param="sat="+sat+"&light="+light;
 
@@ -71,7 +71,7 @@
         function getUpdatedData(){
 
             var updatedLights = new Array();
-            var url = "http://127.0.0.1:5000/update";
+            var url = serverIp+"update";
             var light = $("#lightlist option:selected").val();
            // alert(light);
             var bri;
@@ -103,7 +103,7 @@
             slide: function( event, ui ) {
                 $( "#briamount" ).val( ui.value );
                 var bri = ui.value;
-                var url="http://127.0.0.1:5000/bri";
+                var url = serverIp+"bri";
                 var light = $("#lightlist option:selected").val();
                 var param="bri="+bri+"&light="+light;
                 var http=new XMLHttpRequest();
@@ -136,7 +136,7 @@
                 }
                 var light = $("#lightlist option:selected").val();
 
-                var url="http://127.0.0.1:5000/off";
+                var url= serverIp+"off";
                 var param="on="+toggle+"&light="+light;
                 var http=new XMLHttpRequest();
                 http.open("POST", url, true)
@@ -165,7 +165,7 @@
                 }
 
             var light = $("#lightlist option:selected").val();
-            var url="http://127.0.0.1:5000/effect";
+            var url= serverIp+"effect";
             var params="state="+state+"&light="+light;
             var http=new XMLHttpRequest();
             http.open("POST", url, true)
@@ -182,7 +182,7 @@
 
 
         function getInitialData(){
-            var url="http://127.0.0.1:5000/get";
+            var url= serverIp+"get";
             //alert("getInitialData() Called on body onload");
             //var param="state="+state;
             var http=new XMLHttpRequest();
